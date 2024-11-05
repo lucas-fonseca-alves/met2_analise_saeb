@@ -1,0 +1,1 @@
+Utilize o arquivo .R contido nesta pasta com seu nome para realizar suas análises.

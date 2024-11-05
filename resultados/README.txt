@@ -1,0 +1,1 @@
+Salvar os resultados de suas análises, caso necessário, nesta pasta (tabelas, gráficos, etc).
