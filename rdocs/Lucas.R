@@ -4,9 +4,11 @@ library(moments)
 library(xlsReadWrite)
 
 #carregar as amostras
-lucas <- read_csv("amostra_222025665.csv")
-erica <- read_csv("amostra_222015284.csv")
-andre <- read_csv("amostra_190084235.csv")
+lucas <- read_csv("banco/amostra_222025665.csv")
+erica <- read_csv("banco/amostra_222015284.csv")
+andre <- read_csv("banco/amostra_190084235.csv")
+
+caminho_lucas <- "resultados/Lucas"
 
 #juntar as amostras
 
@@ -52,17 +54,17 @@ write.table(tabela_freq_lp, file='Intervalos_Frequencia_lp.csv', sep=';', dec=',
 
 saeb %>% 
   ggplot(aes(x = NOTA_LP)) +
-  geom_histogram(bins = 10, color = "white", fill = "#A11D21") +
+  geom_histogram(bins = 10, color = "white", fill = "#A11D21")+
+  geom_density(aes(y = ..count..), stat = "bin", bins = 10, color = "#222222", size = 1)+
   theme_classic()+
-  scale_x_continuous(breaks = lp_intervalos)+
+  #scale_x_continuous(breaks = lp_intervalos)+
   #scale_y_continuous(breaks = seq(from = 0,to = 400,by = 50))+
   xlab("Nota Língua Portuguesa")+
   ylab("Frequência")+
   scale_x_continuous(breaks = seq(100,400, 20 ), limits = c(100, 400))
 
 
-
-ggsave("hist-uni-lp.png", width = 158, height = 93, units = "mm")
+ggsave(filename = file.path(caminho_lucas, "hist-uni-lp.png"), width = 158, height = 93, units = "mm")
 
 #------------------------Medidas de Posição-------------------------------------
 #média = 252,58
@@ -122,7 +124,7 @@ ggplot(saeb) +
   labs(x = "", y = "Notas Lingua Portuguesa")+
    scale_y_continuous(breaks = seq(100,400, 50 ), limits = c(100, 400))
 
-ggsave("boxplot-uni-lp.png", width = 158, height = 93, units = "mm")
+ggsave(filename = file.path(caminho_lucas, "boxplot-uni-lp.png"), width = 158, height = 93, units = "mm")
 
 
 #------------------------------------------------------------------------------#----
@@ -159,15 +161,17 @@ write.table(tabela_freq_mt, file='Intervalos_Frequencia_mt.csv', sep=';', dec=',
 
 
 saeb %>% 
-  ggplot(aes(x = NOTA_MT)) +
-  geom_histogram(bins = 10, color = "white", fill = "#A11D21") +
+  ggplot(aes(x = NOTA_MT, y = after_stat(density))) +
+  geom_histogram(aes(y = ..count..), bins = 10, color = "white", fill = "#A11D21") +
+  geom_density(aes(y = ..count..), stat = "bin", bins = 10, color = "#222222", size = 1)+
   theme_classic()+
   scale_x_continuous(breaks = mt_intervalos)+
   #scale_y_continuous(breaks = seq(from = 0,to = max_mt,by = 50))+
   xlab("Nota Matemática")+
   ylab("Frequência")
 
-ggsave("hist-uni-mt.png", width = 158, height = 93, units = "mm")
+ggsave(filename = file.path(caminho_lucas, "hist-uni-mt.png"), width = 158, height = 93, units = "mm")
+
 
 #------------------------Medidas de Posição-------------------------------------
 #média = 251,65
@@ -211,7 +215,6 @@ mt_curtose <- round(moments::kurtosis(saeb$NOTA_MT, na.rm = FALSE),3)
 
 #------------------------------BOXPLOT------------------------------------------
 
-
 ggplot(saeb) +
   aes(
     x = factor(""),
@@ -226,4 +229,4 @@ ggplot(saeb) +
   labs(x = "", y = "Nota Matemática")+
   scale_y_continuous(breaks = seq(100,450, 50 ), limits = c(100, 450))
 
-ggsave("boxplot-uni-mt.png", width = 158, height = 93, units = "mm")
+ggsave(filename = file.path(caminho_lucas, "boxplot-uni-mt.png"), width = 158, height = 93, units = "mm")
