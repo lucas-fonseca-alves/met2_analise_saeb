@@ -5,8 +5,24 @@ library(ggplot2)
 library(ggpubr)
 library(formattable)
 
+
+#Caminho para salvar os gráficos 
+
+caminho_andre <- "resultados/Andre"
+
+
+
+#Amostras 
+lucas <- read_csv("banco/amostra_222025665.csv")
+erica <- read_csv("banco/amostra_222015284.csv")
+andre <- read_csv("banco/amostra_190084235.csv")
+
+
 # Carregando o conjunto de dados
-data <- read.csv("amostra_190084235.csv")
+data <- bind_rows(andre,
+                  erica, 
+                  lucas
+)
 
 # Selecionando e renomeando variáveis de interesse
 data <- data[, c(2, 5, 6, 15, 16)]
@@ -14,13 +30,28 @@ colnames(data) <- c("Região", "Área", "Dependência_Adm", "Escolaridade_Mãe",
 
 # Análise por região
 regioes_frequencia <- as.data.frame(table(data$Região))
-colnames(regioes_frequencia) <- c("Região", "Frequência")
+
+regioes_frequencia <- regioes_frequencia %>% 
+  mutate(freq_relativa = round((Freq/sum(Freq)*100),2))
+
+
+regioes_frequencia$freq_relativa <- gsub("\\.", ",", regioes_frequencia$freq_relativa )
+
+colnames(regioes_frequencia) <- c("Região", "Frequência", "Frequência_Relativa")
+
+labs <- paste0("",regioes_frequencia$Frequência_Relativa , "%")
 
 ggpie(
   data = regioes_frequencia, x = "Frequência",
-  label = "Região", color = "white", fill = "Região",
-  palette = c("#00AFBB", "#E7B800", "#FC4E07", "#88B4E7", "#FFF05A")
+  label = labs, color = "white", fill = "Região",
+  palette = c("#88B4E7", "#c46562", "#51945e", "#e49cb5", "#e09f1f"),
+  lab.pos= "in",
+  lab.font= c(3, "plain", "black"),
+  lab.adjust = -10
 )
+
+ggsave(filename = file.path(caminho_andre, "regiao_escola_pizza.png"), width = 160, height = 95, units = "mm")
+
 
 # Tabela por área
 area_frequencia <- as.data.frame(table(data$Área))
@@ -42,11 +73,19 @@ dep_adm_frequencia <- as.data.frame(table(data[, c("Região", "Dependência_Adm"
 colnames(dep_adm_frequencia) <- c("Região", "Dependência_Adm", "Frequência")
 dep_adm_frequencia$Dependência_Adm <- factor(dep_adm_frequencia$Dependência_Adm, levels = c("Municipal", "Estadual", "Federal"))
 
-ggplot(dep_adm_frequencia, aes(x = Região, y = Frequência, fill = Dependência_Adm)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  scale_fill_manual(values = c("Municipal" = "#FC4E07", "Estadual" = "#00AFBB", "Federal" = "#E7B800")) +
-  labs(title = "Dependências administrativas por região", x = "Região", y = "Frequência") +
-  theme_minimal()
+
+# Retirar o único federal e mostrar no texto
+dep_adm_frequencia %>% 
+  filter(Dependência_Adm != "Federal") %>% 
+  ggplot(aes(x = Região, y = Frequência, fill = Dependência_Adm)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    scale_fill_manual(values = c("Municipal" = "#88B4E7", "Estadual" = "#c46562", "Federal" = "#e09f1f")) +
+    labs(#title = "Dependências administrativas por região", 
+         x = "Região", 
+         y = "Frequência", 
+         fill = "Dependência Administrativa") +
+    theme_minimal()
+ggsave(filename = file.path(caminho_andre, "dep_adm_freq_barras.png"), width = 158, height = 93, units = "mm")
 
 # Análise das escolaridades dos pais
 escolaridade_mae <- as.data.frame(table(data$Escolaridade_Mãe))
@@ -100,11 +139,18 @@ mae_sabe$Parente <- "Mãe"
 pai_sabe$Parente <- "Pai"
 escolaridade_juntos <- rbind(mae_sabe, pai_sabe)
 
-ggplot(escolaridade_juntos, aes(x = Escolaridade, y = Porcentagem, fill = Parente)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(title = "Escolaridade dos pais", subtitle = "dos alunos que sabem a escolaridade dos pais", x = "Escolaridade", y = "Porcentagem (%)") +
-  theme_minimal() +
-  scale_fill_manual(values = c("Pai" = "#88B4E7", "Mãe" = "#FC4E07"))
+escolaridade_juntos %>% 
+  filter(Escolaridade!= is.na(Escolaridade)) %>% 
+  ggplot( aes(x = Escolaridade, y = Porcentagem, fill = Parente)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(#title = "Escolaridade dos pais", 
+         #subtitle = "dos alunos que sabem a escolaridade dos pais", 
+         x = "Escolaridade", 
+         y = "Porcentagem (%)") +
+    theme_minimal() +
+    scale_fill_manual(values = c("Pai" = "#c46562", "Mãe" = "#88B4E7"))
+
+ggsave(filename = file.path(caminho_andre, "escolaridade_pais_barra.png"), width = 158, height = 93, units = "mm")
 
 # Tabelando os alunos que não sabem
 escolaridade_nao_sabe <- data.frame(

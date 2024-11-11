@@ -34,7 +34,7 @@ max_lp <- round(max(saeb$NOTA_LP),2)
 
 
 #Definindo os intervalos automaticamente 
-lp_intervalos = pretty(saeb$NOTA_LP, n = 10)
+lp_intervalos = pretty(saeb$NOTA_LP, n = 12)
 
 # Dividindo os dados e calculando suas frequencias
 freq_intervalos_lp <- cut(saeb$NOTA_LP, 
@@ -54,7 +54,7 @@ write.table(tabela_freq_lp, file='Intervalos_Frequencia_lp.csv', sep=';', dec=',
 
 saeb %>% 
   ggplot(aes(x = NOTA_LP)) +
-  geom_histogram(bins = 10, color = "white", fill = "#A11D21")+
+  geom_histogram(bins = 10, color = "white", fill = "#88B4E7")+
   geom_density(aes(y = ..count..), stat = "bin", bins = 10, color = "#222222", size = 1)+
   theme_classic()+
   #scale_x_continuous(breaks = lp_intervalos)+
@@ -115,7 +115,7 @@ ggplot(saeb) +
     x = factor(""),
     y = NOTA_LP
   ) +
-  geom_boxplot(fill = c("#A11D21"), width = 0.5) +
+  geom_boxplot(fill = c("#88B4E7"), width = 0.5) +
   guides(fill = none) +
   stat_summary(
     fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
@@ -162,7 +162,7 @@ write.table(tabela_freq_mt, file='Intervalos_Frequencia_mt.csv', sep=';', dec=',
 
 saeb %>% 
   ggplot(aes(x = NOTA_MT, y = after_stat(density))) +
-  geom_histogram(aes(y = ..count..), bins = 10, color = "white", fill = "#A11D21") +
+  geom_histogram(aes(y = ..count..), bins = 10, color = "white", fill = "#88B4E7") +
   geom_density(aes(y = ..count..), stat = "bin", bins = 10, color = "#222222", size = 1)+
   theme_classic()+
   scale_x_continuous(breaks = mt_intervalos)+
@@ -220,7 +220,7 @@ ggplot(saeb) +
     x = factor(""),
     y = NOTA_MT
   ) +
-  geom_boxplot(fill = c("#A11D21"), width = 0.5) +
+  geom_boxplot(fill = c("#88B4E7"), width = 0.5) +
   guides(fill = none) +
   stat_summary(
     fun = "mean", geom = "point", shape = 23, size = 3, fill = "white"
@@ -230,3 +230,8 @@ ggplot(saeb) +
   scale_y_continuous(breaks = seq(100,450, 50 ), limits = c(100, 450))
 
 ggsave(filename = file.path(caminho_lucas, "boxplot-uni-mt.png"), width = 158, height = 93, units = "mm")
+
+
+saeb %>% 
+  filter(NOTA_MT >= 381.72) %>% 
+  summarise(quantos = n())
