@@ -1,0 +1,4 @@
+"teste";"estatistica";"p_valor"
+"Shapiro-Wilk";0,990708283971682;0,226216293125261
+"Anderson-Darling";Inf;2,99999999908707e-06
+"Kolmogorov-(Lilliefors)";0,0451707450864832;0,409230449548211
